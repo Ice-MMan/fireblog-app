@@ -9,7 +9,8 @@ import { Formik, Form } from "formik";
 import { TextField } from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
 import * as yup from "yup";
-import { signUpWithGoogle } from "../helpers/firebase";
+import { createUser, signUpWithGoogle } from "../helpers/firebase";
+import { useState } from "react";
 const loginSchema = yup.object().shape({
   email: yup
     .string()
@@ -28,9 +29,28 @@ const loginSchema = yup.object().shape({
 const Register = () => {
   const navigate = useNavigate();
 
+  const initialInfo = {
+    username: "",
+    email: "",
+    password: "",
+  };
+
+  const [userInfo, setUserInfo] = useState(initialInfo);
+
   const handleGoogle = () => {
     signUpWithGoogle(navigate);
   };
+
+  const handleChangeInfo = (e) => {
+    e.preventDefault();
+    const { name, value } = e.target;
+    setUserInfo({ ...userInfo, [name]: value });
+  };
+
+  const handleCreateuser = () => {
+    createUser(userInfo.email, userInfo.password, navigate, userInfo.username);
+  };
+  //! sıralama önemli!!! firebase bakmayı unutma
 
   return (
     <Container maxWidth="lg">
@@ -63,7 +83,7 @@ const Register = () => {
             Register
           </Typography>
           <Formik
-            initialValues={{ email: "", password: "" }}
+            initialValues={userInfo}
             validationSchema={loginSchema}
             onSubmit={(values, actions) => {
               //!login(values)
@@ -87,8 +107,8 @@ const Register = () => {
                     id="username"
                     type="username"
                     variant="outlined"
-                    value={values.username}
-                    onChange={handleChange}
+                    value={userInfo.username}
+                    onChange={handleChangeInfo}
                     onBlur={handleBlur}
                     error={touched.username && Boolean(errors.username)}
                     helperText={touched.username && errors.username}
@@ -99,8 +119,8 @@ const Register = () => {
                     id="email"
                     type="email"
                     variant="outlined"
-                    value={values.email}
-                    onChange={handleChange}
+                    value={userInfo.email}
+                    onChange={handleChangeInfo}
                     onBlur={handleBlur}
                     error={touched.email && Boolean(errors.email)}
                     helperText={touched.email && errors.email}
@@ -111,8 +131,8 @@ const Register = () => {
                     id="password"
                     type="password"
                     variant="outlined"
-                    value={values.password}
-                    onChange={handleChange}
+                    value={userInfo.password}
+                    onChange={handleChangeInfo}
                     onBlur={handleBlur}
                     error={touched.password && Boolean(errors.password)}
                     helperText={touched.password && errors.password}
@@ -121,6 +141,7 @@ const Register = () => {
                     type="submit"
                     loadingPosition="center"
                     variant="contained"
+                    onClick={handleCreateuser}
                   >
                     Submit
                   </LoadingButton>
