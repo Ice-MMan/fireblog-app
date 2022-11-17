@@ -27,7 +27,6 @@ const loginSchema = yup.object().shape({
 });
 const Register = () => {
   const navigate = useNavigate();
-  // const { currentUser, error, loading } = useSelector((state) => state?.auth);
 
   const handleGoogle = () => {
     signUpWithGoogle(navigate);

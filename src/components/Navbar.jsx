@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useContext } from "react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
@@ -13,12 +13,18 @@ import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import AdbIcon from "@mui/icons-material/Adb";
 
+import { Link } from "react-router-dom";
+import { logOut } from "../helpers/firebase";
+import { AuthContext } from "../contexts/AuthContext";
+
 const settings = ["Login", "Register"];
+const pages = ["Profile", "NewBlog", "Dashboard"];
 
 function Navbar() {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
 
+  const { currentUser } = useContext(AuthContext);
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
   };
@@ -129,11 +135,40 @@ function Navbar() {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
-              {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                  <Typography textAlign="center">{setting}</Typography>
+              {currentUser
+                ? pages.map((pages) => (
+                    <MenuItem key={pages} onClick={handleCloseUserMenu}>
+                      <Link
+                        to={`/${pages.toLocaleLowerCase()}`}
+                        style={{ textDecoration: "none", color: "black" }}
+                      >
+                        <Typography textAlign="center">{pages}</Typography>{" "}
+                      </Link>
+                    </MenuItem>
+                  ))
+                : settings.map((setting) => (
+                    <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                      <Link
+                        to={`/${setting.toLocaleLowerCase()}`}
+                        style={{ textDecoration: "none", color: "black" }}
+                      >
+                        <Typography textAlign="center">{setting}</Typography>
+                      </Link>
+                    </MenuItem>
+                  ))}
+              {currentUser && (
+                <MenuItem onClick={handleCloseUserMenu}>
+                  <Link
+                    to="/login"
+                    onClick={() => {
+                      logOut();
+                    }}
+                    style={{ textDecoration: "none", color: "black" }}
+                  >
+                    <Typography textAlign="center">Logout</Typography>
+                  </Link>
                 </MenuItem>
-              ))}
+              )}
             </Menu>
           </Box>
         </Toolbar>
